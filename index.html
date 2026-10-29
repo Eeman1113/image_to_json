@@ -1,0 +1,1039 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f7f7f5">
+<title>Pixel Studio</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f6f6f4;
+  --paper: #fff;
+  --soft: #f8f8f6;
+  --line: #e7e8e4;
+  --line2: #d8dad4;
+  --ink: #20221f;
+  --muted: #71766f;
+  --blue: #3659df;
+  --blue2: #2949c8;
+  --blue-soft: #edf1ff;
+  --radius: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter,
+    Helvetica, Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; width: 100%; }
+body { background: var(--bg); color: var(--ink); font-size: 13px; }
+button, input, textarea { font: inherit; }
+button { color: inherit; }
+button:focus-visible, input:focus-visible, textarea:focus-visible,
+.dropzone:focus-within {
+  outline: 3px solid #3659df38;
+  outline-offset: 2px;
+}
+button:disabled { opacity: .45; cursor: not-allowed; }
+.hidden { display: none !important; }
+
+.app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 276px minmax(0, 1fr);
+}
+.sidebar {
+  min-height: 100vh;
+  background: var(--paper);
+  border-right: 1px solid var(--line);
+  padding: 24px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.brand { display: flex; gap: 11px; align-items: center; padding: 0 3px; }
+.brand-icon {
+  height: 37px; width: 37px; border-radius: 11px;
+  display: grid; place-items: center; color: white; background: #22241f;
+}
+.brand-name { font-weight: 750; font-size: 14px; letter-spacing: -.035em; }
+.brand-sub { color: var(--muted); font-size: 11px; margin-top: 4px; }
+.side-content { display: flex; flex-direction: column; gap: 25px; }
+.eyebrow {
+  margin: 0 0 10px; font-size: 10px; font-weight: 750;
+  letter-spacing: .11em; text-transform: uppercase; color: var(--muted);
+}
+.dropzone {
+  position: relative; min-height: 136px;
+  border: 1px dashed #d5d8d1; border-radius: 12px; background: var(--soft);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center; padding: 16px 12px;
+  cursor: pointer; transition: .18s;
+}
+.dropzone:hover, .dropzone.drag { border-color: var(--blue); background: #f4f6ff; }
+.dropzone input {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; cursor: pointer;
+}
+.uploadicon {
+  height: 36px; width: 36px; display: grid; place-items: center;
+  border-radius: 10px; background: #eeefec; margin-bottom: 10px; color: #52574f;
+}
+.droptitle { font-size: 12px; font-weight: 700; }
+.dropsub { font-size: 11px; color: var(--muted); margin-top: 5px; }
+.file {
+  display: flex; align-items: center; gap: 8px; margin-top: 9px; padding: 8px;
+  border: 1px solid var(--line); border-radius: 10px; min-width: 0;
+}
+.fileicon {
+  width: 27px; height: 27px; border-radius: 7px; background: var(--blue-soft);
+  color: var(--blue); display: grid; place-items: center; flex: none;
+}
+.filecopy { min-width: 0; flex: 1; }
+.filename {
+  font-size: 11px; font-weight: 650; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+}
+.filemeta { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.iconbtn {
+  border: 0; background: transparent; border-radius: 7px;
+  width: 28px; height: 28px; display: grid; place-items: center;
+  color: var(--muted); cursor: pointer;
+}
+.iconbtn:hover { background: #f0f1ee; color: var(--ink); }
+.segmented {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 3px;
+  padding: 4px; background: #f0f1ee; border: 1px solid #e9eae6;
+  border-radius: 11px;
+}
+.segment {
+  min-height: 34px; border: 0; border-radius: 8px; background: transparent;
+  color: var(--muted); font-size: 11px; font-weight: 650; cursor: pointer;
+}
+.segment[aria-pressed="true"] {
+  color: var(--ink); background: white;
+  box-shadow: 0 1px 3px #16191417, 0 0 0 1px #1e221b09;
+}
+.settings { display: flex; flex-direction: column; gap: 17px; }
+.setting { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.settingtitle { font-weight: 650; font-size: 12px; }
+.settinghint { font-size: 10.5px; line-height: 1.45; color: var(--muted); margin-top: 4px; }
+.switch { position: relative; flex: none; width: 34px; height: 20px; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.track {
+  position: absolute; inset: 0; border-radius: 99px;
+  background: #d8dbd5; cursor: pointer; transition: background .18s;
+}
+.track:after {
+  content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px;
+  border-radius: 50%; background: white; box-shadow: 0 1px 2px #0002;
+  transition: transform .18s;
+}
+.switch input:checked + .track { background: var(--blue); }
+.switch input:checked + .track:after { transform: translateX(14px); }
+.rangebox {
+  padding: 11px; border: 1px solid var(--line);
+  border-radius: 10px; background: var(--soft);
+}
+.rangetop {
+  display: flex; justify-content: space-between; gap: 8px;
+  font-size: 10px; color: var(--muted); margin-bottom: 8px;
+}
+.rangevalue { color: var(--ink); font-weight: 700; }
+input[type="range"] { width: 100%; accent-color: var(--blue); }
+.rangeends { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin-top: 5px; }
+
+.main { min-width: 0; min-height: 100vh; display: flex; flex-direction: column; }
+.topbar {
+  height: 68px; flex: none; display: flex; align-items: center; justify-content: flex-end;
+  gap: 10px; padding: 0 28px; border-bottom: 1px solid var(--line);
+  background: #ffffffc7;
+}
+.topright { display: flex; gap: 9px; align-items: center; }
+.views {
+  display: flex; gap: 2px; padding: 3px; border: 1px solid var(--line);
+  border-radius: 10px; background: #f7f8f5;
+}
+.view {
+  min-height: 31px; padding: 7px 11px; border: 0; border-radius: 7px;
+  background: transparent; color: var(--muted); font-size: 11px;
+  font-weight: 650; cursor: pointer;
+}
+.view[aria-pressed="true"] {
+  background: white; color: var(--ink); box-shadow: 0 1px 3px #16191417;
+}
+.divider { height: 23px; width: 1px; background: var(--line); margin: 0 2px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 35px; padding: 0 12px; border: 1px solid var(--line2);
+  border-radius: 9px; background: white; font-size: 11px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: .15s;
+}
+.btn:hover:not(:disabled) { background: #fbfbf9; border-color: #c6c9c1; }
+.primary { background: var(--blue); border-color: var(--blue); color: white; }
+.primary:hover:not(:disabled) { background: var(--blue2); border-color: var(--blue2); }
+.progress { height: 2px; background: #e9ecf8; flex: none; }
+.progress span { display: block; height: 100%; width: 0; background: var(--blue); transition: width .1s linear; }
+.work { flex: 1; min-height: 0; padding: 24px 28px; display: flex; }
+.stage {
+  flex: 1; min-height: 460px; min-width: 0; overflow: hidden;
+  border: 1px solid #e1e3dd; border-radius: var(--radius); background: white;
+  box-shadow: 0 12px 40px #1c1f190b, 0 1px 3px #1c1f1908;
+  display: flex; flex-direction: column;
+}
+.stagebar {
+  height: 45px; flex: none; border-bottom: 1px solid #eceee9;
+  display: flex; align-items: center; justify-content: flex-end; padding: 0 12px; gap: 7px;
+}
+.zoomlabel { min-width: 38px; text-align: center; color: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+.stagebody {
+  position: relative; min-height: 0; flex: 1; overflow: auto;
+  display: flex; align-items: center; justify-content: center; padding: 28px;
+  background-color: #fdfdfc;
+  background-image:
+    linear-gradient(45deg,#f0f1ee 25%,transparent 25%),
+    linear-gradient(-45deg,#f0f1ee 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#f0f1ee 75%),
+    linear-gradient(-45deg,transparent 75%,#f0f1ee 75%);
+  background-size: 18px 18px;
+  background-position: 0 0,0 9px,9px -9px,-9px 0;
+}
+.empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 16px; }
+.emptyicon {
+  height: 72px; width: 72px; display: grid; place-items: center;
+  border: 1px solid #dcded8; border-radius: 20px; background: #ffffffdf; margin-bottom: 18px;
+}
+.emptytitle { font-size: 14px; font-weight: 750; letter-spacing: -.02em; }
+.emptytext { font-size: 11px; color: var(--muted); margin: 7px 0 15px; }
+.previewwrap { display: none; flex: none; transform-origin: center; transition: transform .1s; }
+canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
+#previewCanvas { display: block; max-width: none; background: transparent; }
+.codeview { display: none; position: absolute; inset: 0; flex-direction: column; background: #181a18; color: #e3e7e0; }
+.codetop {
+  height: 44px; flex: none; display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 0 13px; border-bottom: 1px solid #2e322d; color: #b7beb3; font-size: 10px;
+}
+.codeactions { display: flex; gap: 7px; }
+.darkbtn {
+  min-height: 27px; padding: 0 9px; border: 1px solid #3c413a; border-radius: 7px;
+  background: #242824; color: #e0e4db; font-size: 10px; font-weight: 650; cursor: pointer;
+}
+.darkbtn:hover:not(:disabled) { background: #30362f; }
+#codeOutput {
+  width: 100%; height: 100%; min-height: 0; flex: 1; resize: none;
+  padding: 20px; border: 0; outline: none; background: #181a18; color: #d5dfd1;
+  font: 11px/1.7 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  white-space: pre; tab-size: 2;
+}
+#codeOutput:focus-visible { outline: 2px solid #7692ed; outline-offset: -3px; }
+.bigoutput {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 7px; text-align: center; padding: 25px; color: #b7beb3;
+}
+.bigoutput strong { font-size: 13px; color: #e3e7e0; }
+.bigoutput span { max-width: 280px; font-size: 11px; line-height: 1.6; }
+.toast {
+  position: fixed; right: 20px; bottom: 20px; z-index: 10;
+  max-width: min(420px,calc(100vw - 32px)); padding: 11px 14px;
+  border: 1px solid var(--line); border-radius: 10px; background: white;
+  box-shadow: 0 12px 35px #191e151f; font-size: 11px; opacity: 0;
+  pointer-events: none; transform: translateY(7px); transition: .18s;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.error { border-color: #edc6c3; color: #9d302d; }
+
+@media(max-width:900px) {
+  .app { grid-template-columns: 245px minmax(0,1fr); }
+  .sidebar { padding: 20px 14px; }
+  .topbar { padding: 0 16px; }
+  .work { padding: 17px; }
+  .stagebody { padding: 20px; }
+}
+@media(max-width:680px) {
+  .app { display: flex; flex-direction: column; }
+  .sidebar { min-height: auto; gap: 18px; padding: 15px 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .brand-icon { width: 33px; height: 33px; }
+  .side-content { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
+  .side-content>section:first-child { grid-row: span 2; }
+  .dropzone { min-height: 120px; }
+  .main { min-height: 60vh; }
+  .topbar { height: auto; min-height: 60px; padding: 10px 14px; flex-wrap: wrap; }
+  .topright { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
+  .work { padding: 12px; }
+  .stage { min-height: 440px; }
+  .stagebody { min-height: 360px; padding: 18px; }
+}
+@media(max-width:430px) {
+  .side-content { grid-template-columns: 1fr; }
+  .side-content>section:first-child { grid-row: auto; }
+  .dropzone { min-height: 112px; }
+  .topright { justify-content: space-between; }
+  .view { padding: 7px 8px; }
+  .btn { padding: 0 9px; }
+  .divider { display: none; }
+  .stage { min-height: 410px; }
+  .stagebody { min-height: 320px; padding: 12px; }
+  #codeOutput { padding: 14px; font-size: 10px; }
+  .codetop { padding: 0 9px; }
+  .codeactions { gap: 4px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*:before,*:after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="5" height="5" rx="1" fill="currentColor"/>
+          <rect x="10" y="3" width="5" height="5" rx="1" fill="currentColor" opacity=".7"/>
+          <rect x="17" y="3" width="4" height="5" rx="1" fill="currentColor" opacity=".4"/>
+          <rect x="3" y="10" width="5" height="5" rx="1" fill="currentColor" opacity=".7"/>
+          <rect x="10" y="10" width="5" height="5" rx="1" fill="currentColor"/>
+          <rect x="17" y="10" width="4" height="5" rx="1" fill="currentColor" opacity=".7"/>
+          <rect x="3" y="17" width="5" height="4" rx="1" fill="currentColor" opacity=".4"/>
+          <rect x="10" y="17" width="5" height="4" rx="1" fill="currentColor" opacity=".7"/>
+          <rect x="17" y="17" width="4" height="4" rx="1" fill="currentColor"/>
+        </svg>
+      </div>
+      <div><div class="brand-name">Pixel Studio</div><div class="brand-sub">Image to pixel code</div></div>
+    </div>
+
+    <div class="side-content">
+      <section>
+        <h2 class="eyebrow">Source file</h2>
+        <label class="dropzone" id="dropzone" for="imageInput">
+          <input id="imageInput" type="file" accept="image/*,.json,application/json">
+          <span class="uploadicon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/>
+              <path d="M5 14.5v4A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-4"/>
+            </svg>
+          </span>
+          <span class="droptitle" id="dropTitle">Drop a file here</span>
+          <span class="dropsub" id="dropSubtitle">or <span style="color:var(--blue);font-weight:700">browse files</span></span>
+        </label>
+        <div class="file hidden" id="fileStatus" aria-live="polite">
+          <span class="fileicon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 2v6h6M8 13h8M8 17h8"/>
+            </svg>
+          </span>
+          <div class="filecopy"><div class="filename" id="fileName"></div><div class="filemeta" id="fileMeta"></div></div>
+          <button class="iconbtn" id="clearBtn" type="button" title="Remove file" aria-label="Remove file">×</button>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="eyebrow">Output format</h2>
+        <div class="segmented" role="group" aria-label="Output format">
+          <button class="segment" id="jsonBtn" type="button" aria-pressed="true">{ } JSON</button>
+          <button class="segment" id="cssBtn" type="button" aria-pressed="false">&lt;/&gt; CSS</button>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="eyebrow">Settings</h2>
+        <div class="settings">
+          <div class="setting">
+            <div><div class="settingtitle">Original resolution</div><div class="settinghint">Keep every source pixel</div></div>
+            <label class="switch"><input id="fullRes" type="checkbox" checked aria-label="Use original resolution"><span class="track"></span></label>
+          </div>
+          <div id="rangeBox" class="rangebox hidden">
+            <div class="rangetop"><label for="maxDim">Maximum dimension</label><span class="rangevalue" id="rangeValue">8192 px</span></div>
+            <input id="maxDim" type="range" min="16" max="16384" step="16" value="8192">
+            <div class="rangeends"><span>16 px</span><span>16,384 px</span></div>
+          </div>
+          <div class="setting">
+            <div><div class="settingtitle">Compact colors</div><div class="settinghint">Use hex for opaque pixels</div></div>
+            <label class="switch"><input id="compact" type="checkbox" checked aria-label="Compact opaque colors"><span class="track"></span></label>
+          </div>
+        </div>
+      </section>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topright">
+        <div class="views" role="group" aria-label="View">
+          <button class="view" id="previewBtn" type="button" aria-pressed="true">Preview</button>
+          <button class="view" id="codeBtn" type="button" aria-pressed="false">Code</button>
+        </div>
+        <span class="divider"></span>
+        <button class="btn" id="copyBtn" type="button" disabled>Copy</button>
+        <button class="btn primary" id="exportBtn" type="button" disabled>Export</button>
+      </div>
+    </header>
+    <div class="progress hidden" id="progress"><span id="progressFill"></span></div>
+    <div class="work">
+      <section class="stage" aria-label="Pixel output">
+        <div class="stagebar">
+          <button class="iconbtn" id="zoomOut" type="button" aria-label="Zoom out" title="Zoom out">−</button>
+          <span class="zoomlabel" id="zoomLabel">100%</span>
+          <button class="iconbtn" id="zoomIn" type="button" aria-label="Zoom in" title="Zoom in">+</button>
+          <button class="iconbtn" id="zoomReset" type="button" aria-label="Reset zoom" title="Reset zoom">⤢</button>
+        </div>
+
+        <div class="stagebody" id="stageBody">
+          <div class="empty" id="empty">
+            <div class="emptyicon">
+              <svg width="35" height="35" viewBox="0 0 40 40" fill="none">
+                <rect x="5" y="5" width="9" height="9" rx="2" fill="#4E68DB"/>
+                <rect x="16" y="5" width="9" height="9" rx="2" fill="#A5B2EF"/>
+                <rect x="27" y="5" width="8" height="9" rx="2" fill="#D8DDF6"/>
+                <rect x="5" y="16" width="9" height="9" rx="2" fill="#9CAAEF"/>
+                <rect x="16" y="16" width="9" height="9" rx="2" fill="#4E68DB"/>
+                <rect x="27" y="16" width="8" height="9" rx="2" fill="#A5B2EF"/>
+                <rect x="5" y="27" width="9" height="8" rx="2" fill="#D8DDF6"/>
+                <rect x="16" y="27" width="9" height="8" rx="2" fill="#A5B2EF"/>
+                <rect x="27" y="27" width="8" height="8" rx="2" fill="#4E68DB"/>
+              </svg>
+            </div>
+            <div class="emptytitle">Drop an image to begin</div>
+            <div class="emptytext">or choose a file</div>
+            <button class="btn primary" id="chooseBtn" type="button">Choose file</button>
+          </div>
+
+          <div class="previewwrap" id="previewWrap"><canvas id="previewCanvas" aria-label="Pixel preview"></canvas></div>
+
+          <div class="codeview" id="codeView">
+            <div class="codetop">
+              <span id="codeTitle">output.json</span>
+              <div class="codeactions">
+                <button class="darkbtn" id="codeCopy" type="button" disabled>Copy code</button>
+                <button class="darkbtn" id="codeExport" type="button" disabled>Export file</button>
+              </div>
+            </div>
+            <div id="bigOutput" class="bigoutput hidden"><strong>Large output</strong><span>Use Export to write the full file in chunks.</span></div>
+            <textarea id="codeOutput" readonly spellcheck="false" aria-label="Generated code" placeholder=""></textarea>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const $ = id => document.getElementById(id);
+  const el = {
+    input:$('imageInput'), drop:$('dropzone'), dropTitle:$('dropTitle'),
+    dropSubtitle:$('dropSubtitle'), fileStatus:$('fileStatus'), fileName:$('fileName'),
+    fileMeta:$('fileMeta'), clear:$('clearBtn'), jsonBtn:$('jsonBtn'), cssBtn:$('cssBtn'),
+    fullRes:$('fullRes'), rangeBox:$('rangeBox'), maxDim:$('maxDim'), rangeValue:$('rangeValue'),
+    compact:$('compact'), previewBtn:$('previewBtn'), codeBtn:$('codeBtn'),
+    empty:$('empty'), choose:$('chooseBtn'), previewWrap:$('previewWrap'),
+    canvas:$('previewCanvas'), codeView:$('codeView'), codeOutput:$('codeOutput'),
+    codeTitle:$('codeTitle'), bigOutput:$('bigOutput'), copy:$('copyBtn'),
+    export:$('exportBtn'), codeCopy:$('codeCopy'), codeExport:$('codeExport'),
+    zoomOut:$('zoomOut'), zoomIn:$('zoomIn'), zoomReset:$('zoomReset'), zoomLabel:$('zoomLabel'),
+    stageBody:$('stageBody'), progress:$('progress'), progressFill:$('progressFill'),
+    toast:$('toast')
+  };
+
+  const ROWS = 24;
+  const PREVIEW_MAX = 1400;
+  const INLINE_LIMIT = 50000;
+  const state = {
+    file:null, kind:null, image:null, json:null, width:0, height:0, count:0,
+    format:'json', view:'preview', zoom:1, generated:'', smallOutput:true,
+    token:0, toastTimer:0
+  };
+
+  const raf = () => new Promise(resolve => requestAnimationFrame(resolve));
+
+  function notify(message, error=false) {
+    clearTimeout(state.toastTimer);
+    el.toast.textContent = message;
+    el.toast.classList.toggle('error', error);
+    el.toast.classList.add('show');
+    state.toastTimer = setTimeout(() => el.toast.classList.remove('show'), 3200);
+  }
+
+  function progress(p, show=true) {
+    el.progress.classList.toggle('hidden', !show);
+    el.progressFill.style.width = Math.max(0, Math.min(100, p)) + '%';
+  }
+
+  function formatNumber(n) {
+    return Number(n).toLocaleString();
+  }
+
+  function rgbaToHex(r,g,b) {
+    return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+  }
+
+  function colorAt(data, i) {
+    const r=data[i], g=data[i+1], b=data[i+2], a=data[i+3];
+    if (a===255 && el.compact.checked) return rgbaToHex(r,g,b);
+    if (a===255) return `rgba(${r},${g},${b},1)`;
+    return `rgba(${r},${g},${b},${(a/255).toFixed(3).replace(/0+$/,'').replace(/\.$/,'')})`;
+  }
+
+  function delimiter() {
+    return state.format === 'json' ? ',' : ',\n  ';
+  }
+
+  function outputPrefix(count) {
+    if (state.format === 'json') {
+      return `{"width":${state.width},"height":${state.height},"totalPixels":${count},"pixels":[`;
+    }
+    return `/* Pixel Studio · ${state.width} × ${state.height}px · ${count} pixels */\n.pixel-art-container{position:relative;width:${state.width}px;height:${state.height}px}\n.pixel-art{position:absolute;top:0;left:0;width:1px;height:1px;box-shadow:\n  `;
+  }
+
+  function outputSuffix() {
+    return state.format === 'json' ? ']}' : ';\n}\n';
+  }
+
+  function setFormat(format) {
+    state.format = format;
+    el.jsonBtn.setAttribute('aria-pressed', String(format==='json'));
+    el.cssBtn.setAttribute('aria-pressed', String(format==='css'));
+    refreshInlineOutput();
+  }
+
+  function updateButtons(has) {
+    [el.copy,el.export,el.codeCopy,el.codeExport].forEach(b => b.disabled=!has);
+  }
+
+  function setView(view) {
+    state.view = view;
+    const has = !!state.width;
+    el.previewBtn.setAttribute('aria-pressed', String(view==='preview'));
+    el.codeBtn.setAttribute('aria-pressed', String(view==='code'));
+    el.empty.classList.toggle('hidden', has);
+    el.previewWrap.style.display = has && view==='preview' ? 'block' : 'none';
+    el.codeView.style.display = has && view==='code' ? 'flex' : 'none';
+    if (view==='code' && has) showCodeView();
+  }
+
+  function updateZoom(z) {
+    state.zoom = Math.max(.25, Math.min(8, Math.round(z*4)/4));
+    el.zoomLabel.textContent = Math.round(state.zoom*100)+'%';
+    el.previewWrap.style.transform = `scale(${state.zoom})`;
+  }
+
+  function updateFileStatus(file, meta='') {
+    if (!file) {
+      el.fileStatus.classList.add('hidden');
+      el.dropTitle.textContent = 'Drop a file here';
+      el.dropSubtitle.innerHTML = 'or <span style="color:var(--blue);font-weight:700">browse files</span>';
+      return;
+    }
+    el.fileStatus.classList.remove('hidden');
+    el.fileName.textContent = file.name;
+    el.fileMeta.textContent = meta;
+    el.dropTitle.textContent = 'Replace current file';
+    el.dropSubtitle.textContent = 'Drop another file or browse';
+  }
+
+  function clearState() {
+    state.token++;
+    state.file=null; state.kind=null; state.image=null; state.json=null;
+    state.width=state.height=state.count=0;
+    state.generated=''; state.smallOutput=true;
+    el.canvas.width=0; el.canvas.height=0; el.codeOutput.value='';
+    el.bigOutput.classList.add('hidden');
+    el.codeOutput.classList.remove('hidden');
+    updateFileStatus(null);
+    updateButtons(false);
+    progress(0,false);
+    setView('preview');
+  }
+
+  function targetDimensions(image) {
+    let w=image.naturalWidth||image.width;
+    let h=image.naturalHeight||image.height;
+
+    if (!el.fullRes.checked) {
+      const max=Number(el.maxDim.value);
+      if (Math.max(w,h)>max) {
+        const s=max/Math.max(w,h);
+        w=Math.max(1,Math.round(w*s));
+        h=Math.max(1,Math.round(h*s));
+      }
+    }
+    return {width:w,height:h};
+  }
+
+  function setPreviewSize(w,h) {
+    const scale=Math.min(1,PREVIEW_MAX/Math.max(w,h));
+    const pw=Math.max(1,Math.round(w*scale));
+    const ph=Math.max(1,Math.round(h*scale));
+    el.canvas.width=pw; el.canvas.height=ph;
+    el.previewWrap.style.width=pw+'px';
+    el.previewWrap.style.height=ph+'px';
+    el.canvas.style.width=pw+'px';
+    el.canvas.style.height=ph+'px';
+    return {pw,ph};
+  }
+
+  async function processImage(image, token) {
+    const {width:w,height:h}=targetDimensions(image);
+    state.width=w; state.height=h; state.image=image; state.kind='image';
+    state.json=null; state.count=0; state.generated=''; state.smallOutput=true;
+    setPreviewSize(w,h);
+
+    const pctx=el.canvas.getContext('2d',{alpha:true});
+    pctx.clearRect(0,0,el.canvas.width,el.canvas.height);
+
+    const strip=document.createElement('canvas');
+    strip.width=w; strip.height=Math.min(ROWS,h);
+    const sctx=strip.getContext('2d',{willReadFrequently:true});
+    if (!sctx) throw new Error('Could not create a processing canvas.');
+
+    const natW=image.naturalWidth||image.width;
+    const natH=image.naturalHeight||image.height;
+    let inlineChunks=[];
+    let canInline=true;
+    let visible=0;
+    const sep=delimiter();
+
+    for(let y=0;y<h;y+=ROWS) {
+      if(token!==state.token) return;
+
+      const rows=Math.min(ROWS,h-y);
+      strip.height=rows;
+      sctx.clearRect(0,0,w,rows);
+      sctx.drawImage(image,0,y*natH/h,natW,rows*natH/h,0,0,w,rows);
+      const d=sctx.getImageData(0,0,w,rows).data;
+      const values=[];
+
+      for(let p=0,offset=0;offset<d.length;p++,offset+=4) {
+        if(d[offset+3]===0) continue;
+        visible++;
+
+        if(canInline) {
+          const x=p%w;
+          const py=y+Math.floor(p/w);
+          const color=colorAt(d,offset);
+          values.push(state.format==='json'
+            ? JSON.stringify({x,y:py,color})
+            : `${x}px ${py}px 0 ${color}`);
+
+          if(visible>INLINE_LIMIT) {
+            canInline=false;
+            inlineChunks=[];
+            values.length=0;
+          }
+        }
+      }
+
+      if(canInline && values.length) inlineChunks.push(values.join(sep));
+
+      const sy=Math.floor(y*el.canvas.height/h);
+      const ey=(y+rows===h)
+        ? el.canvas.height
+        : Math.round((y+rows)*el.canvas.height/h);
+      const destRows=Math.max(1,ey-sy);
+
+      pctx.drawImage(image,0,y*natH/h,natW,rows*natH/h,
+        0,sy,el.canvas.width,destRows);
+
+      progress((y+rows)/h*100,true);
+      if(y%(ROWS*4)===0) await raf();
+    }
+
+    if(token!==state.token) return;
+    state.count=visible;
+    state.smallOutput=canInline;
+    state.generated=canInline
+      ? outputPrefix(visible)+inlineChunks.join(sep)+outputSuffix()
+      : '';
+
+    updateFileStatus(state.file,`${formatNumber(w)} × ${formatNumber(h)} px`);
+    updateButtons(true);
+    setView(state.view);
+    refreshInlineOutput();
+  }
+
+  function parsedPixelColor(value) {
+    if(typeof value==='string') return value;
+    if(value && typeof value==='object' && 'r' in value) {
+      return `rgba(${value.r},${value.g},${value.b},${value.a??1})`;
+    }
+    return '#000';
+  }
+
+  async function processJSON(data, token) {
+    const w=Number(data.width);
+    const h=Number(data.height);
+    const pixels=data.pixels;
+
+    if(!Number.isSafeInteger(w)||!Number.isSafeInteger(h)||w<1||h<1||!Array.isArray(pixels)) {
+      throw new Error('This JSON needs numeric width/height and a pixels array.');
+    }
+
+    state.width=w; state.height=h; state.count=pixels.length;
+    state.kind='json'; state.json=data; state.image=null; state.generated='';
+    setPreviewSize(w,h);
+
+    const ctx=el.canvas.getContext('2d');
+    ctx.clearRect(0,0,el.canvas.width,el.canvas.height);
+    const sx=el.canvas.width/w;
+    const sy=el.canvas.height/h;
+    const CHUNK=12000;
+    const inline=pixels.length<=INLINE_LIMIT;
+    const items=[];
+
+    for(let start=0;start<pixels.length;start+=CHUNK) {
+      if(token!==state.token) return;
+      const end=Math.min(pixels.length,start+CHUNK);
+
+      for(let i=start;i<end;i++) {
+        const p=pixels[i];
+        if(!p||!Number.isFinite(Number(p.x))||!Number.isFinite(Number(p.y))) continue;
+        ctx.fillStyle=parsedPixelColor(p.color);
+        ctx.fillRect(Number(p.x)*sx,Number(p.y)*sy,Math.max(sx,.25),Math.max(sy,.25));
+        if(inline) items.push({x:Number(p.x),y:Number(p.y),color:parsedPixelColor(p.color)});
+      }
+
+      progress(end/pixels.length*100,true);
+      await raf();
+    }
+
+    state.smallOutput=inline;
+    if(inline) {
+      state.generated=JSON.stringify({
+        width:w,height:h,totalPixels:pixels.length,pixels:items
+      },null,2);
+    }
+    updateFileStatus(state.file,`${formatNumber(w)} × ${formatNumber(h)} px`);
+    updateButtons(true);
+    setView(state.view);
+    refreshInlineOutput();
+  }
+
+  function encodePixel(p) {
+    return state.format==='json'
+      ? JSON.stringify({x:Number(p.x),y:Number(p.y),color:parsedPixelColor(p.color)})
+      : `${Number(p.x)}px ${Number(p.y)}px 0 ${parsedPixelColor(p.color)}`;
+  }
+
+  function refreshInlineOutput() {
+    el.codeTitle.textContent=state.format==='json'?'output.json':'output.css';
+    if(!state.width) {
+      el.codeOutput.value='';
+      return;
+    }
+
+    if(state.kind==='json'&&state.smallOutput&&state.json) {
+      const normalized=state.json.pixels.map(p=>({
+        x:Number(p.x),y:Number(p.y),color:parsedPixelColor(p.color)
+      }));
+      state.generated=state.format==='json'
+        ? JSON.stringify({
+            width:state.width,height:state.height,
+            totalPixels:state.count,pixels:normalized
+          },null,2)
+        : outputPrefix(state.count)+normalized.map(encodePixel).join(delimiter())+outputSuffix();
+    } else if(state.kind==='image'&&state.smallOutput) {
+      const matches=state.generated&&(
+        (state.format==='json'&&state.generated.startsWith('{')) ||
+        (state.format==='css'&&state.generated.startsWith('/*'))
+      );
+      if(!matches) state.generated='';
+    } else {
+      state.generated='';
+    }
+
+    if(state.generated) {
+      el.codeOutput.value=state.generated;
+      el.codeOutput.classList.remove('hidden');
+      el.bigOutput.classList.add('hidden');
+    } else {
+      el.codeOutput.value='';
+      el.codeOutput.classList.add('hidden');
+      el.bigOutput.classList.remove('hidden');
+    }
+    updateButtons(!!state.width);
+  }
+
+  function showCodeView() {
+    refreshInlineOutput();
+  }
+
+  function loadImageFile(file) {
+    return new Promise((resolve,reject)=>{
+      const url=URL.createObjectURL(file);
+      const img=new Image();
+      img.onload=()=>{URL.revokeObjectURL(url);resolve(img);};
+      img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Could not open this image.'));};
+      img.src=url;
+    });
+  }
+
+  async function loadFile(file) {
+    if(!file) return;
+    const token=++state.token;
+    state.file=file;
+    progress(0,true);
+
+    try {
+      if(file.name.toLowerCase().endsWith('.json')||file.type==='application/json') {
+        const text=await file.text();
+        if(token!==state.token) return;
+        await processJSON(JSON.parse(text),token);
+      } else {
+        const image=await loadImageFile(file);
+        if(token!==state.token) return;
+        state.image=image;
+        state.kind='image';
+        await processImage(image,token);
+      }
+
+      if(token===state.token) {
+        setView(state.view);
+        notify('Ready.');
+      }
+    } catch(e) {
+      if(token===state.token) {
+        clearState();
+        notify(e.message||'Could not open this file.',true);
+      }
+    } finally {
+      if(token===state.token) progress(0,false);
+    }
+  }
+
+  async function saveStream(filename,mime,writerFn) {
+    let writable=null;
+    const parts=[];
+
+    if(typeof window.showSaveFilePicker==='function') {
+      try {
+        const handle=await window.showSaveFilePicker({suggestedName:filename});
+        writable=await handle.createWritable();
+      } catch(e) {
+        if(e.name==='AbortError') return false;
+        throw e;
+      }
+    }
+
+    const write=async value=>{
+      if(!value) return;
+      if(writable) await writable.write(value);
+      else parts.push(value);
+    };
+
+    try {
+      await writerFn(write);
+      if(writable) {
+        await writable.close();
+      } else {
+        const blob=new Blob(parts,{type:mime});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a');
+        a.href=url; a.download=filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),5000);
+      }
+      return true;
+    } catch(e) {
+      if(writable) {
+        try { await writable.abort(); } catch {}
+      }
+      throw e;
+    }
+  }
+
+  async function exportImage(write) {
+    const w=state.width,h=state.height,img=state.image;
+    const nw=img.naturalWidth||img.width;
+    const nh=img.naturalHeight||img.height;
+    const strip=document.createElement('canvas');
+    strip.width=w; strip.height=Math.min(ROWS,h);
+
+    const ctx=strip.getContext('2d',{willReadFrequently:true});
+    if(!ctx) throw new Error('Could not create a processing canvas.');
+
+    let first=true;
+    const sep=delimiter();
+
+    for(let y=0;y<h;y+=ROWS) {
+      const rows=Math.min(ROWS,h-y);
+      strip.height=rows;
+      ctx.clearRect(0,0,w,rows);
+      ctx.drawImage(img,0,y*nh/h,nw,rows*nh/h,0,0,w,rows);
+      const d=ctx.getImageData(0,0,w,rows).data;
+      const values=[];
+
+      for(let p=0,off=0;off<d.length;p++,off+=4) {
+        if(d[off+3]===0) continue;
+        const x=p%w;
+        const py=y+Math.floor(p/w);
+        const color=colorAt(d,off);
+        values.push(state.format==='json'
+          ? JSON.stringify({x,y:py,color})
+          : `${x}px ${py}px 0 ${color}`);
+      }
+
+      if(values.length) {
+        if(!first) await write(sep);
+        await write(values.join(sep));
+        first=false;
+      }
+
+      progress((y+rows)/h*100,true);
+      if(y%(ROWS*3)===0) await raf();
+    }
+  }
+
+  async function exportJSONSource(write) {
+    const pixels=state.json.pixels;
+    let first=true;
+    const chunkSize=10000;
+    const sep=delimiter();
+
+    for(let i=0;i<pixels.length;i+=chunkSize) {
+      const group=pixels.slice(i,i+chunkSize).map(encodePixel);
+      if(group.length) {
+        if(!first) await write(sep);
+        await write(group.join(sep));
+        first=false;
+      }
+      progress(Math.min(100,(i+chunkSize)/pixels.length*100),true);
+      await raf();
+    }
+  }
+
+  async function exportOutput() {
+    if(!state.width) return;
+
+    const ext=state.format==='json'?'json':'css';
+    const filename=`pixel-art.${ext}`;
+    const mime=state.format==='json'
+      ? 'application/json;charset=utf-8'
+      : 'text/css;charset=utf-8';
+
+    try {
+      progress(0,true);
+      const ok=await saveStream(filename,mime,async write=>{
+        await write(outputPrefix(state.count));
+        if(state.kind==='image') await exportImage(write);
+        else await exportJSONSource(write);
+        await write(outputSuffix());
+      });
+      if(ok) notify('Exported '+filename);
+    } catch(e) {
+      notify(e.message||'Export failed. Try a browser that supports saving large files.',true);
+    } finally {
+      progress(0,false);
+    }
+  }
+
+  async function copyText() {
+    if(!state.width) return;
+    if(!state.generated) {
+      notify('This output is too large to copy. Use Export instead.',true);
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(state.generated);
+      notify('Copied.');
+    } catch {
+      el.codeOutput.classList.remove('hidden');
+      el.bigOutput.classList.add('hidden');
+      el.codeOutput.focus();
+      el.codeOutput.select();
+      try {
+        document.execCommand('copy');
+        notify('Copied.');
+      } catch {
+        notify('Copy was blocked. Select the code and copy it manually.',true);
+      }
+    }
+  }
+
+  function reprocess() {
+    if(state.file) loadFile(state.file);
+  }
+
+  el.input.addEventListener('change',e=>{
+    const file=e.target.files?.[0];
+    if(file) loadFile(file);
+    e.target.value='';
+  });
+
+  el.choose.addEventListener('click',()=>el.input.click());
+  el.clear.addEventListener('click',clearState);
+
+  el.jsonBtn.addEventListener('click',()=>{
+    setFormat('json');
+    if(state.width&&state.kind==='image') reprocess();
+  });
+
+  el.cssBtn.addEventListener('click',()=>{
+    setFormat('css');
+    if(state.width&&state.kind==='image') reprocess();
+  });
+
+  el.fullRes.addEventListener('change',()=>{
+    el.rangeBox.classList.toggle('hidden',el.fullRes.checked);
+    reprocess();
+  });
+
+  el.maxDim.addEventListener('input',()=>{
+    el.rangeValue.textContent=formatNumber(el.maxDim.value)+' px';
+    reprocess();
+  });
+
+  el.compact.addEventListener('change',reprocess);
+  el.previewBtn.addEventListener('click',()=>setView('preview'));
+  el.codeBtn.addEventListener('click',()=>setView('code'));
+
+  [el.copy,el.codeCopy].forEach(button=>button.addEventListener('click',copyText));
+  [el.export,el.codeExport].forEach(button=>button.addEventListener('click',exportOutput));
+
+  el.zoomIn.addEventListener('click',()=>updateZoom(state.zoom+.25));
+  el.zoomOut.addEventListener('click',()=>updateZoom(state.zoom-.25));
+  el.zoomReset.addEventListener('click',()=>updateZoom(1));
+
+  ['dragenter','dragover'].forEach(type=>{
+    el.drop.addEventListener(type,e=>{
+      e.preventDefault();
+      el.drop.classList.add('drag');
+    });
+  });
+
+  ['dragleave','dragend'].forEach(type=>{
+    el.drop.addEventListener(type,e=>{
+      e.preventDefault();
+      if(!el.drop.contains(e.relatedTarget)) el.drop.classList.remove('drag');
+    });
+  });
+
+  el.drop.addEventListener('drop',e=>{
+    e.preventDefault();
+    el.drop.classList.remove('drag');
+    const file=e.dataTransfer.files?.[0];
+    if(file) loadFile(file);
+  });
+
+  document.addEventListener('dragover',e=>e.preventDefault());
+  document.addEventListener('drop',e=>{
+    if(!el.drop.contains(e.target)) e.preventDefault();
+  });
+
+  el.rangeValue.textContent=formatNumber(el.maxDim.value)+' px';
+  updateButtons(false);
+  setView('preview');
+})();
+</script>
+</body>
+</html>
